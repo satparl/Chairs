@@ -1,0 +1,67 @@
+@using ChairElections.Models;
+@*model IEnumerable<ChairNomination>*@
+@model IEnumerable<ChairElections.Models.NominationViewModel>
+
+@{
+    ViewData["Title"] = "Chair Nominations";
+}
+
+<h2>Chair Nominations</h2>
+
+<p>
+    <a asp-action="Create" asp-controller="ChairNomination" class="btn btn-primary">Create New Nomination</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Total Votes</th>
+            <th>Labour Votes</th>
+            @* <th>Actions</th> *@
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var group in Model.GroupBy(n => n.CommitteeId))
+{
+    var committee = group.First();
+
+    <tr class="table-primary">
+        <td colspan="5"><strong>@committee.CommitteeName</strong></td>
+    </tr>
+
+    @foreach (var nominee in group.GroupBy(n => n.NomineeId))
+    {
+        var nomineeInfo = nominee.First();
+        var totalVotes = nominee.Count();
+        var labourVotes = nominee.Count(v => v.NominatedParty.Contains("Labour"));
+        var collapseId = $"votes-{nomineeInfo.NomineeId}-{committee.CommitteeId}";
+
+        <tr class="table-secondary">
+            <td colspan="2">@nomineeInfo.NomineeName</td>
+            <td>Total Votes: @totalVotes</td>
+            <td>Labour Votes: @labourVotes</td>
+            <td>
+                <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
+                    Show Votes
+                </button>
+            </td>
+        </tr>
+
+        <tbody id="@collapseId" class="collapse">
+            @foreach (var vote in nominee)
+            {
+                <tr>
+                    <td colspan="2">@(vote.NominatedByName)</td>
+                    <td>@(vote.NominatedParty)</td>
+                    <td>@(vote.NominationDate)</td>
+                    <td>
+                       <a asp-action="Delete" asp-controller="ChairNomination" asp-route-id="@vote.Id" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    }
+}
+    </tbody>
+</table>

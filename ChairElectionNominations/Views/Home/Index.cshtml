@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p><a asp-controller="Committee" asp-action="Index">View All Committees</a>
+    </p>
+    <p><a asp-controller="ChairNomination" asp-action="Index">Create Nomination </a>
+    </p>
+    <p><a asp-controller="Members" asp-action="GetAllActiveCommonsView">Get All Active Commons Members</a>
+    </p>
+</div>
+
+<p>members search</p>
+<input type="text" id="memberSearch" placeholder="Search for a member..." />
+<input type="hidden" id="selectedMemberId" name="selectedMemberId" />
+
+@section Scripts {
+
+    <script>
+        $(function () {
+            $("#memberSearch").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("SearchMembers", "Members")',
+                        data: { term: request.term },
+                        success: function (data) {
+                            console.log(data);
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name,
+                                    value: item.name + (item.party ? " (" + item.party + ")" : ""),
+                                    id: item.id
+                                };
+                            }));
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    $("#selectedMemberId").val(ui.item.id);
+                },
+                minLength: 2
+            });
+        });
+    </script>
+}

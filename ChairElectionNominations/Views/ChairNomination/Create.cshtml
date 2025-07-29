@@ -1,0 +1,133 @@
+@model ChairElections.Models.ChairNomination
+
+
+@{
+    ViewData["Title"] = "Create Nomination";
+    string nomineeName="", nominatorName="";
+    if(ViewData["Nominee"] != null)
+    {
+        var nomineeNameTemp = ViewData["Nominee"] as MemberApi.Models.Member;
+        nomineeName = nomineeNameTemp?.NameDisplayAs ?? "";
+    }
+    if(ViewData["NominatedBy"] != null)
+    {
+        var nominatorNameTemp = ViewData["NominatedBy"] as MemberApi.Models.Member;
+        nominatorName = nominatorNameTemp?.NameDisplayAs ?? "";
+    }
+    var committees = Model.Committees.Select(c => new SelectListItem
+{
+    Value = c.Key.ToString(),
+    Text = c.Value,
+    Selected = (c.Key == Model.CommitteeId)
+}).ToList();
+
+}
+
+<h2>Create Nomination</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        <label class="control-label">Nomination for:</label>
+        <input type="text" id="memberSearch" placeholder="Search for a member..." value="@(nomineeName)" class="form-control" />
+        <input type="hidden" asp-for="NomineeId" class="form-control" />
+        <span asp-validation-for="NomineeId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Nominated by:</label>
+        <input type="text" id="nominatorSearch" placeholder="Search for a member..." value="@(nominatorName)" class="form-control" />
+        <input type="hidden" asp-for="NominatedById" class="form-control" />
+        <span asp-validation-for="NominatedById" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+
+        <label class="control-label">For committee chair:</label>
+        <select asp-for="CommitteeId" asp-items="committees" class="form-control">
+            <option value=""></option>
+        </select>
+        <span asp-validation-for="CommitteeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group" style="display: none;">
+        <label asp-for="NominationDate" class="control-label"></label>
+        <input type="hidden" asp-for="NominationDate" class="form-control" value="@DateTime.Now" />
+        <span asp-validation-for="NominationDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NominationSummary" class="control-label"></label>
+        <input type="text" asp-for="NominationSummary" class="form-control" value="" />
+        <span asp-validation-for="NominationSummary" class="text-danger"></span>
+    </div>
+<div class="form-group">
+    <button type="submit" class="btn btn-success">Submit Nomination</button>
+</div>
+</form>
+
+
+
+@section Scripts {
+ @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $("#memberSearch").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("SearchMembers", "Members")',
+                        data: { term: request.term },
+                        success: function (data) {
+                            console.log(data);
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name,
+                                    value: item.name + (item.party ? " (" + item.party + ")" : ""),
+                                    id: item.id
+                                };
+                            }));
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    $("#NomineeId").val(ui.item.id);
+                    $("#memberSearch").val(ui.item.value);
+                    $("#NominationSummary").val("Nomination for " + ui.item.label + " from " + $("#nominatorSearch").val() + " representing " + $('#CommitteeId option:selected').text());
+                },
+                minLength: 2
+            });
+
+            $("#nominatorSearch").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("SearchMembers", "Members")',
+                        data: { term: request.term },
+                        success: function (data) {
+                            console.log(data);
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name,
+                                    value: item.name + (item.party ? " (" + item.party + ")" : ""),
+                                    id: item.id
+                                };
+                            }));
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    $("#NominatedById").val(ui.item.id);
+                    $("#NominationSummary").val("Nomination for " + $("#memberSearch").val() + " from " + ui.item.label + " representing " + $('#CommitteeId option:selected').text());
+                },
+                minLength: 2
+            });
+            
+
+
+
+    });
+
+    $('#CommitteeId').on('input', function () {
+        $("#NominationSummary").val("Nomination for " + $("#memberSearch").val() + " from " + $("#nominatorSearch").val() + " representing " + $('#CommitteeId option:selected').text());
+    });
+    </script>
+}

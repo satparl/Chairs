@@ -1,0 +1,55 @@
+@model List<MemberViewModel>
+
+@{
+    ViewData["Title"] = "All Active Commons Members";
+    var parties = Model.Select(m => m.Party).Distinct().OrderBy(p => p).ToList();
+}
+
+<h2>@ViewData["Title"]</h2>
+
+
+<table id="membersTable" class="display">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Party</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model.OrderBy(m => m.Party).ThenBy(m => m.Name))
+        {
+            <tr>
+                <td>@member.Id</td>
+                <td>@member.Name</td>
+                <td>@member.Party</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@foreach (var party in parties)
+{
+    <h3>@party</h3>
+    <p>
+        @{
+        var memberParty = Model.Where(m => m.Party == party);
+}
+            <span>@(memberParty.Count())</span><br />
+        }
+
+    </p>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#membersTable').DataTable({
+                "pageLength": 10,
+                "order": [[1, "asc"]]
+            });
+        });
+    </script>
+}
