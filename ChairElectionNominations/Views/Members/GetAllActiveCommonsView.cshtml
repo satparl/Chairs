@@ -29,19 +29,21 @@
 </table>
 
 
-
+<div>
 @foreach (var party in parties)
 {
     <h3>@party</h3>
-    <p>
-        @{
-        var memberParty = Model.Where(m => m.Party == party);
-}
-            <span>@(memberParty.Count())</span><br />
-        }
 
-    </p>
+        {
+        var memberParty = Model.Where(m => m.Party == party);
+        
+            if (memberParty.Any()) 
+            {
+                <p>@(memberParty.Count())</p>
+            }
+        }
 }
+</div>
 
 @section Scripts {
     <script>

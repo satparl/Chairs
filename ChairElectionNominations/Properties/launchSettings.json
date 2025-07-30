@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:35440",
+      "applicationUrl": "http://localhost:35440,https://localhost:44334,http://10.202.127.150:35440,https://10.202.127.150:44334,http://lapp800.parliament.uk:35440,https://lapp800.parliament.uk:44334",
       "sslPort": 44334
     }
   },

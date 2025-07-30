@@ -1,0 +1,16 @@
+@using MemberApi.Models;
+@model PartyMembersServiceSearchResult
+@{
+    ViewData["Title"] = "Current Parties";
+}
+<h2>@ViewData["Title"]</h2>
+@foreach (var parties in Model.Items)
+{
+    foreach (var partyLink in parties.Links)
+    {
+        <a title="@partyLink.Method" href="@partyLink.Href">@partyLink.Rel</a>
+    }
+    Party party = parties.Value;
+    <p>@party.Name</p>
+    <p>@party.GovernmentType</p>
+}

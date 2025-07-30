@@ -149,6 +149,14 @@ namespace ChairElectionNominations.Controllers
             var result = await _service.GetActiveAsync(House.Commons);
             return Ok(result);
         }
+
+        [HttpGet("parties")]
+        public async Task<IActionResult> GetCurrentParties()
+        {
+            var result = await _service.GetActiveAsync(House.Commons);
+            return View(result);
+        }
+
         [HttpGet("active-commons")]
         public async Task<IActionResult> GetAllActiveCommons()
         {
@@ -234,45 +242,48 @@ namespace ChairElectionNominations.Controllers
 
             return View(allMembers);
         }
-        
-[HttpGet]
-public async Task<IActionResult> SearchMembers(string term)
-{
-    var result = await _service.Search2Async(
-                    name: term,
-                    location: null,
-                    postTitle: null,
-                    partyId: null,
-                    house: House.Commons, // Replace with House.Commons if you rename the enum
-                    constituencyId: null,
-                    nameStartsWith: null,
-                    gender: null,
-                    membershipStartedSince: null,
-                    membershipEnded_MembershipEndedSince: null,
-                    membershipEnded_MembershipEndReasonIds: null,
-                    membershipInDateRange_WasMemberOnOrAfter: null,
-                    membershipInDateRange_WasMemberOnOrBefore: null,
-                    membershipInDateRange_WasMemberOfHouse: null,
-                    isEligible: null,
-                    isCurrentMember: true,
-                    policyInterestId: null,
-                    experience: null,
-                    skip: 0,
-                    take: 20,
-                    cancellationToken: CancellationToken.None
-    );
 
-    var suggestions = result.Items.Select(m => new MemberViewModel
-    {
-        Id = m.Value.Id,
-        Name = m.Value.NameDisplayAs,// + (m.Value.LatestParty != null ? $" ({m.Value.LatestParty.Name})" : ""),
-        Party = m.Value.LatestParty?.Name
-    });
+        [HttpGet]
+        public async Task<IActionResult> SearchMembers(string term)
+        {
+            var result = await _service.Search2Async(
+                            name: term,
+                            location: null,
+                            postTitle: null,
+                            partyId: null,
+                            house: House.Commons, // Replace with House.Commons if you rename the enum
+                            constituencyId: null,
+                            nameStartsWith: null,
+                            gender: null,
+                            membershipStartedSince: null,
+                            membershipEnded_MembershipEndedSince: null,
+                            membershipEnded_MembershipEndReasonIds: null,
+                            membershipInDateRange_WasMemberOnOrAfter: null,
+                            membershipInDateRange_WasMemberOnOrBefore: null,
+                            membershipInDateRange_WasMemberOfHouse: null,
+                            isEligible: null,
+                            isCurrentMember: true,
+                            policyInterestId: null,
+                            experience: null,
+                            skip: 0,
+                            take: 20,
+                            cancellationToken: CancellationToken.None
+            );
 
-    return Json(suggestions);
-}
+            var suggestions = result.Items.Select(m => new MemberViewModel
+            {
+                Id = m.Value.Id,
+                Name = m.Value.NameDisplayAs,// + (m.Value.LatestParty != null ? $" ({m.Value.LatestParty.Name})" : ""),
+                Party = m.Value.LatestParty?.Name
+            });
 
-
-
+            return Json(suggestions);
+        }
+        public async Task<IActionResult> GetParties(string house = "Commons")
+        {
+            House selectedHouse = house == "Commons" ? House.Commons : House.Lords;
+            PartySeatCountMembersServiceSearchResult results = await _service.StateOfThePartiesAsync(House.Commons, DateTime.Now);
+            return View(results);
+        }
     }
 }

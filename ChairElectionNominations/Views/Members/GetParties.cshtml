@@ -1,0 +1,17 @@
+@using MemberApi.Models
+@model PartySeatCountMembersServiceSearchResult
+
+@foreach(PartySeatCountItem parties in Model.Items)
+{
+    foreach(var partyLink in parties.Links)
+    {
+        <a title="@partyLink.Method" href="@partyLink.Href">@partyLink.Rel</a>
+    }
+    PartySeatCount seat = parties.Value;
+    <br/>
+   <p>Female @seat.Female</p> 
+    <p> Male @seat.Male</p> 
+    <p> Party @seat.Party</p> 
+    <p>Total @seat.Total</p> 
+    
+}
