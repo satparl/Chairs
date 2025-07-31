@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using ChairElections.Models;
 using ChairElections.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +9,8 @@ public class ChairNominationController : Controller
     private readonly ChairNominationService _service;
     private readonly CommitteeService _committeeService;
 
-        private readonly MembersApiService _memberService;
-        private readonly HttpClient _httpClient;
+    private readonly MembersApiService _memberService;
+    private readonly HttpClient _httpClient;
 
 
     private readonly MembersApiService _membersApiService = new MembersApiService("", new HttpClient());
@@ -28,13 +29,13 @@ public class ChairNominationController : Controller
         List<NominationViewModel> nominationDetails = new List<NominationViewModel>();
         var nominations = await _service.GetAllAsync();
 
-
         foreach (var nomination in nominations)
         {
+
             var nominee = await _memberService.MembersAsync(nomination.NomineeId, null);
             var nominator = await _memberService.MembersAsync(nomination.NominatedById, null);
             var committee = await _committeeService.GetCommitteeByIdAsync(nomination.CommitteeId);
-
+            var registeredInterest = await _service.GetRegisteredInterestByIds(nomination.NomineeId, nomination.CommitteeId);
             nominationDetails.Add(new NominationViewModel
             {
                 Id = nomination.Id,
@@ -46,7 +47,9 @@ public class ChairNominationController : Controller
                 CommitteeId = nomination.CommitteeId,
                 CommitteeName = committee ?? "Unknown",
                 NominationDate = nomination.NominationDate,
-                Summary = nomination.NominationSummary
+                Summary = nomination.NominationSummary,
+                RegisteredInterest = registeredInterest != null ? registeredInterest.RegisteredInterestText : "",
+                NominateeParty = (nominee.Value as MemberApi.Models.Member).LatestParty.Name ?? "Unknown"
             });
         }
         return View(nominationDetails);
@@ -101,7 +104,7 @@ public class ChairNominationController : Controller
         {
             MemberApi.Models.MemberItem tempName = await _memberService.MembersAsync(nomination.NomineeId, null);
             ViewData["Nominee"] = tempName.Value;
-        }   
+        }
 
 
         return View(nomination);
@@ -121,4 +124,34 @@ public class ChairNominationController : Controller
         await _service.DeleteAsync(id);
         return RedirectToAction(nameof(Index));
     }
+    
+            [HttpGet("registered-interest")]
+        public async Task<IActionResult> RegisterInterests(int MemberId, int CommitteeId)
+        {
+            var model = new RegisteredInterest();
+
+            model.CommitteeId = CommitteeId;
+            model.MemberId = MemberId;
+            var checkModel = await _service.GetRegisteredInterest(model);
+            if (checkModel != null)
+            {
+                model = checkModel;
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddRegisterInterest(RegisteredInterest model)
+        {
+        if (ModelState.IsValid)
+        {
+            _service.SaveOrUpdateInterest(model);
+        }
+        else
+        {
+            ModelState.AddModelError("RegisteredInterestText", "Error");
+            RedirectToAction("RegisterInterests", model);
+        }
+            return RedirectToAction("Index");//
+        }
+
 }

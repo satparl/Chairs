@@ -23,7 +23,9 @@ public class ChairNomination
 
     public string NominationSummary { get; set; }
 
+    public string RegisteredInterest { get; set; }
     public DateTime NominationDate { get; set; }
+    
     [NotMapped]
     [ValidateNever]
     public List<KeyValuePair<int, string>> Committees { get; set; }

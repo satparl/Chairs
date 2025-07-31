@@ -16,7 +16,7 @@
     @foreach (var item in Model)
     {
         <tr>
-            <td>@item.Name</td>
+            <td>@item.Name @(item.AssignedParty != string.Empty ? "(" + item.AssignedParty + ")": "(n/a)")</td>
             <td>@item.Status</td>
             <td>@item.DateModified.ToShortDateString()</td>
             <td>

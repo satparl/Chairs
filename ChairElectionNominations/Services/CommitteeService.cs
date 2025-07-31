@@ -55,4 +55,5 @@ public class CommitteeService
         var committee = await _context.Committees.FindAsync(committeeId);
         return committee?.Name;
     }
+    
 }

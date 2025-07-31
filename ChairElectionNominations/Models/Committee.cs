@@ -15,9 +15,13 @@ public class Committee
     public string Status { get; set; }
     public DateTime DateModified { get; set; }
     public int? CurrentChairId { get; set; }
+
+    public string AssignedParty { get; set; }
+
     [ValidateNever]
     [NotMapped]
     public List<ChairNomination> ChairNominations { get; set; }
+
     [ValidateNever]
     [NotMapped]
     public List<NominationViewModel> NominationFullDetails { get; set; }

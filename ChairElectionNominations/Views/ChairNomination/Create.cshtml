@@ -32,13 +32,13 @@
 
     <div class="form-group">
         <label class="control-label">Nomination for:</label>
-        <input type="text" id="memberSearch" placeholder="Search for a member..." value="@(nomineeName)" class="form-control" />
+        <input type="text" id="memberSearch" placeholder="Search for a member to nominate..." value="@(nomineeName)" class="form-control" />
         <input type="hidden" asp-for="NomineeId" class="form-control" />
         <span asp-validation-for="NomineeId" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label class="control-label">Nominated by:</label>
-        <input type="text" id="nominatorSearch" placeholder="Search for a member..." value="@(nominatorName)" class="form-control" />
+        <input type="text" id="nominatorSearch" placeholder="Search member who is nominating..." value="@(nominatorName)" class="form-control" />
         <input type="hidden" asp-for="NominatedById" class="form-control" />
         <span asp-validation-for="NominatedById" class="text-danger"></span>
     </div>
@@ -55,6 +55,11 @@
         <label asp-for="NominationDate" class="control-label"></label>
         <input type="hidden" asp-for="NominationDate" class="form-control" value="@DateTime.Now" />
         <span asp-validation-for="NominationDate" class="text-danger"></span>
+    </div>
+        <div class="form-group">
+        <label asp-for="RegisteredInterest" class="control-label"></label>
+        <input type="text" placeholder="e.g. Father owns a chain of public houses" asp-for="RegisteredInterest" class="form-control" value="" />
+        <span asp-validation-for="RegisteredInterest" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="NominationSummary" class="control-label"></label>

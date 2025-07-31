@@ -3,6 +3,7 @@ using System;
 using ChairElections.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChairElectionNominations.Migrations
 {
     [DbContext(typeof(CommitteeContext))]
-    partial class CommitteeContextModelSnapshot : ModelSnapshot
+    [Migration("20250731143653_AddCommitteesTable3")]
+    partial class AddCommitteesTable3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -75,27 +78,6 @@ namespace ChairElectionNominations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Committees");
-                });
-
-            modelBuilder.Entity("ChairElections.Models.RegisteredInterest", b =>
-                {
-                    b.Property<int>("RegisteredInterestId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CommitteeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MemberId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RegisteredInterestText")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("RegisteredInterestId");
-
-                    b.ToTable("RegisteredInterests");
                 });
 #pragma warning restore 612, 618
         }

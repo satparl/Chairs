@@ -1,3 +1,4 @@
+using System.Security.Authentication.ExtendedProtection;
 using ChairElections.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,5 +41,41 @@ public class ChairNominationService
     public async Task<bool> HasAlreadyVotedOffice(int office, int NominatedById)
     {
         return await _context.ChairNominations.AnyAsync(n => n.CommitteeId == office && n.NominatedById == NominatedById);
+    }
+    public async Task<string?> SaveOrUpdateInterest(RegisteredInterest model)
+    {
+        var existingInterest = await _context.RegisteredInterests
+            .FirstOrDefaultAsync(r => r.MemberId == model.MemberId && r.CommitteeId == model.CommitteeId);
+
+        if (existingInterest != null)
+        {
+            // Update existing record
+            existingInterest.RegisteredInterestText = model.RegisteredInterestText;
+            _context.Update(existingInterest);
+        }
+        else
+        {
+            // Insert new record
+            await _context.RegisteredInterests.AddAsync(model);
+        }
+
+        await _context.SaveChangesAsync();
+        return model.RegisteredInterestText;
+    }
+    public async Task<RegisteredInterest> GetRegisteredInterest(RegisteredInterest model)
+    {
+        var existingInterest = await _context.RegisteredInterests
+            .FirstOrDefaultAsync(r => r.MemberId == model.MemberId && r.CommitteeId == model.CommitteeId);
+        return existingInterest;
+        
+    }
+
+    public async Task<RegisteredInterest> GetRegisteredInterestByIds(int nomineeId, int committeeId)
+    {
+        var model = new RegisteredInterest();
+        model.CommitteeId = committeeId;
+        model.MemberId = nomineeId;
+        var interest = await GetRegisteredInterest(model);
+        return interest;
     }
 }

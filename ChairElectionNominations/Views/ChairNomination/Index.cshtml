@@ -15,10 +15,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Total Votes</th>
-            <th>Labour Votes</th>
-            @* <th>Actions</th> *@
+            <th colspan="2">Name</th>
+            <th>Total</th>
+            <th>Same Party</th>
+            <th>Other Party</th>
+             <th>Actions</th> 
         </tr>
     </thead>
     <tbody>
@@ -27,24 +28,38 @@
     var committee = group.First();
 
     <tr class="table-primary">
-        <td colspan="5"><strong>@committee.CommitteeName</strong></td>
+        <td colspan="6"><strong>@committee.CommitteeName</strong></td>
     </tr>
 
     @foreach (var nominee in group.GroupBy(n => n.NomineeId))
     {
+        var nomParty = nominee.Count(x=> x.NominatedParty.Contains(x.NominateeParty));
+        var nomOtherParty = nominee.Count(x=> x.NominateeParty != x.NominatedParty);
         var nomineeInfo = nominee.First();
         var totalVotes = nominee.Count();
         var labourVotes = nominee.Count(v => v.NominatedParty.Contains("Labour"));
         var collapseId = $"votes-{nomineeInfo.NomineeId}-{committee.CommitteeId}";
 
         <tr class="table-secondary">
-            <td colspan="2">@nomineeInfo.NomineeName</td>
-            <td>Total Votes: @totalVotes</td>
-            <td>Labour Votes: @labourVotes</td>
+            <td colspan="2">@nomineeInfo.NomineeName (@(nomineeInfo.NominateeParty))
+                <p class="tiny">@nomineeInfo.RegisteredInterest</p>
+            </td>
+            <td> @totalVotes</td>
+            <td> @nomParty</td>
+            <td> @nomOtherParty</td>
             <td>
                 <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
                     Show Votes
                 </button>
+
+<a asp-controller="ChairNomination"
+   asp-action="RegisterInterests"
+   asp-route-MemberId="@nomineeInfo.NomineeId"
+   asp-route-CommitteeId="@committee.CommitteeId"
+   class="btn btn-sm btn-outline-info">
+   Add Interest
+</a>
+
             </td>
         </tr>
 
@@ -54,7 +69,7 @@
                 <tr>
                     <td colspan="2">@(vote.NominatedByName)</td>
                     <td>@(vote.NominatedParty)</td>
-                    <td>@(vote.NominationDate)</td>
+                    <td colspan="2">@(vote.NominationDate)</td>
                     <td>
                        <a asp-action="Delete" asp-controller="ChairNomination" asp-route-id="@vote.Id" class="btn btn-danger btn-sm">Delete</a>
                     </td>
@@ -65,3 +80,8 @@
 }
     </tbody>
 </table>
+<style>
+    .tiny {
+        font-size: xx-small;
+    }
+    </style>

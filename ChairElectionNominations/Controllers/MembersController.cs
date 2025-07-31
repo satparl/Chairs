@@ -4,6 +4,9 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MemberApi.Models;
+using AspNetCoreGeneratedDocument;
+using ChairElections.Models;
+
 
 
 namespace ChairElectionNominations.Controllers
@@ -14,10 +17,11 @@ namespace ChairElectionNominations.Controllers
     {
         private readonly MembersApiService _service;
         private readonly HttpClient httpClient;
-
-        public MembersController(HttpClient _httpClient)
+        private readonly CommitteeContext _context;
+        public MembersController(HttpClient _httpClient, CommitteeContext committeeContext)
         {
             httpClient = _httpClient;
+            _context = committeeContext;
             _service = new MembersApiService("https://members-api.parliament.uk/", httpClient);
         }
 
@@ -285,5 +289,8 @@ namespace ChairElectionNominations.Controllers
             PartySeatCountMembersServiceSearchResult results = await _service.StateOfThePartiesAsync(House.Commons, DateTime.Now);
             return View(results);
         }
+
+
+
     }
 }

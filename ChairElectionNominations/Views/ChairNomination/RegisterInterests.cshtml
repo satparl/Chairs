@@ -1,0 +1,25 @@
+@using ChairElections.Models
+@model RegisteredInterest 
+@{
+    ViewData["Title"] = "Add Registered Interest";
+    var summaryText = "Adding Registered Interest for Member Id " + Model.MemberId + " and committee " + Model.CommitteeId ;
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>@summaryText</p>
+<form asp-action="AddRegisterInterest" method="post">
+    <div class="form-group">
+        <input asp-for="MemberId" type="hidden" name="MemberId" class="form-control" />
+    </div>
+    <div class="form-group">
+        <input asp-for="CommitteeId" type="hidden" name="CommitteeId" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <input asp-for="RegisteredInterestText" placeholder="please enter register of interest here" name="RegisteredInterestText" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Interest</button>
+</form>
+
+<h1>satpal</h1>
