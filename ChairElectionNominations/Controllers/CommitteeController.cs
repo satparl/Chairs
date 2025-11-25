@@ -48,10 +48,32 @@ public class CommitteeController : Controller
 
     public async Task<IActionResult> Edit(int id)
     {
+        ViewData["PrimeParties"] = GetPrimeParties();
         var committee = await _context.Set<Committee>().FindAsync(id);
         if (committee == null) return NotFound();
         return View(committee);
     }
+
+    public List<string> GetPrimeParties()
+    {
+        return new List<string>
+        {   
+            "Labour",
+            "Conservative",
+            "Green Party",
+            "Liberal Democrats",
+            "Reform UK",
+            "Scottish National Party",
+            "Plaid Cymru",
+            "Democratic Unionist Party",
+            "Sinn Féin",
+            "Social Democratic and Labour Party",
+            "Ulster Unionist Party",
+            "Alliance Party of Northern Ireland",
+            "Independent",
+            "Other"
+        };
+    }   
 
     [HttpPost]
     public async Task<IActionResult> Edit(Committee committee)

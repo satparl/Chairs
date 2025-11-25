@@ -5,6 +5,12 @@ using ParliamentApi.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    options.Configure(context.Configuration.GetSection("Kestrel"));
+});
+
+var basePath = builder.Configuration["BasePath"];
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<CommitteeContext>();
@@ -17,6 +23,11 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+
+if (!string.IsNullOrEmpty(basePath))
+{
+    app.UsePathBase(basePath);
+}
 
 using (var scope = app.Services.CreateScope())
 {

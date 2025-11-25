@@ -13,7 +13,9 @@ namespace ChairElections.Models
         public string NominatedByName { get; set; }
         public int CommitteeId { get; set; }
         public string CommitteeName { get; set; }
-        public string RegisteredInterest { get; set; }
+        public string? RegisteredInterest { get; set; }
+
+        public string? VoteRegisteredInterest { get; set; }
         public DateTime NominationDate { get; set; }
         public string Summary { get; set; }
         public string NominatedParty { get; internal set; }

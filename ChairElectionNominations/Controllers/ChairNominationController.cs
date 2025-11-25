@@ -48,7 +48,8 @@ public class ChairNominationController : Controller
                 CommitteeName = committee ?? "Unknown",
                 NominationDate = nomination.NominationDate,
                 Summary = nomination.NominationSummary,
-                RegisteredInterest = registeredInterest != null ? registeredInterest.RegisteredInterestText : "",
+                RegisteredInterest = registeredInterest?.RegisteredInterestText,
+                VoteRegisteredInterest = nomination.RegisteredInterest,// registeredInterest != null ? registeredInterest.RegisteredInterestText : "",
                 NominateeParty = (nominee.Value as MemberApi.Models.Member).LatestParty.Name ?? "Unknown"
             });
         }
@@ -125,7 +126,7 @@ public class ChairNominationController : Controller
         return RedirectToAction(nameof(Index));
     }
     
-            [HttpGet("registered-interest")]
+        [HttpGet("registered-interest")]
         public async Task<IActionResult> RegisterInterests(int MemberId, int CommitteeId)
         {
             var model = new RegisteredInterest();

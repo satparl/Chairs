@@ -21,12 +21,12 @@ public class ChairNomination
     [Required(ErrorMessage = "Nominator is required.")]
     public int NominatedById { get; set; }
 
-    public string NominationSummary { get; set; }
+    public string? NominationSummary { get; set; }
 
-    public string RegisteredInterest { get; set; }
+    public string? RegisteredInterest { get; set; }
     public DateTime NominationDate { get; set; }
     
     [NotMapped]
     [ValidateNever]
-    public List<KeyValuePair<int, string>> Committees { get; set; }
+    public List<KeyValuePair<int, string>>? Committees { get; set; }
 }

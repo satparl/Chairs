@@ -66,8 +66,14 @@
         <tbody id="@collapseId" class="collapse">
             @foreach (var vote in nominee)
             {
+                @*@(nomineeInfo.RegisteredInterest !=null ? Html.Raw("<br /><div style='font-size: 50%;'>"+nomineeInfo.RegisteredInterest+"</div>") : "")*@
                 <tr>
-                    <td colspan="2">@(vote.NominatedByName)</td>
+                    <td colspan="2">
+                        @(vote.NominatedByName)
+
+                        @(string.IsNullOrEmpty(vote.VoteRegisteredInterest) ? "" : Html.Raw("<p class='tiny'>"+vote.VoteRegisteredInterest+"</p>"))
+                    </td>
+
                     <td>@(vote.NominatedParty)</td>
                     <td colspan="2">@(vote.NominationDate)</td>
                     <td>
