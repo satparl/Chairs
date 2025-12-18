@@ -78,4 +78,47 @@ public class ChairNominationService
         var interest = await GetRegisteredInterest(model);
         return interest;
     }
+    public async Task<ChairStatement> GetChairStatements(ChairStatement model, bool All=false)
+    {
+
+        var existingStatement = await _context.ChairStatements
+            .FirstOrDefaultAsync(r => r.MemberId == model.MemberId && r.CommitteeId == model.CommitteeId);
+        return existingStatement;
+
+    }
+
+    public async Task<List<ChairStatement>> GetAllChairStatements(int committeeId=0)
+    {
+        if (committeeId == 0)
+        {
+            return await _context.ChairStatements.ToListAsync();
+        }
+        else
+        {
+        var statements = await _context.ChairStatements
+            .Where(r => r.CommitteeId == committeeId)
+            .ToListAsync();
+            return statements;
+        }
+    }
+    public async Task<string?> SaveOrUpdateChairStatement(ChairStatement model)
+    {
+        var existingStatement = await _context.ChairStatements
+            .FirstOrDefaultAsync(r => r.MemberId == model.MemberId && r.CommitteeId == model.CommitteeId);
+
+        if (existingStatement != null)
+        {
+            // Update existing record
+            existingStatement.ChairStatementText = model.ChairStatementText;
+            _context.Update(existingStatement);
+        }
+        else
+        {
+            // Insert new record
+            await _context.ChairStatements.AddAsync(model);
+        }
+
+        await _context.SaveChangesAsync();
+        return model.ChairStatementText;
+    }
 }

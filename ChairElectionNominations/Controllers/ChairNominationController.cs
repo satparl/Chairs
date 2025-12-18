@@ -4,6 +4,12 @@ using ChairElections.Services;
 using Microsoft.AspNetCore.Mvc;
 using ParliamentApi.Client;
 
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
+using System.Xml;
+
+
 public class ChairNominationController : Controller
 {
     private readonly ChairNominationService _service;
@@ -26,9 +32,23 @@ public class ChairNominationController : Controller
 
     public async Task<IActionResult> Index()
     {
-        List<NominationViewModel> nominationDetails = new List<NominationViewModel>();
-        var nominations = await _service.GetAllAsync();
+        List<NominationViewModel> nominationDetails = await MapToViewModel();
+        return View(nominationDetails);
+    }
 
+
+    [HttpGet("xml")]
+    [Produces("application/xml")]
+    public async Task<IActionResult> GetNominationsXml()
+    {
+        var nominations = await MapToViewModel();
+        return Ok(nominations); 
+    }
+
+    public async Task<List<NominationViewModel>> MapToViewModel()
+    {
+        var nominations = await _service.GetAllAsync();
+        var nominationDetails = new List<NominationViewModel>();
         foreach (var nomination in nominations)
         {
 
@@ -36,6 +56,7 @@ public class ChairNominationController : Controller
             var nominator = await _memberService.MembersAsync(nomination.NominatedById, null);
             var committee = await _committeeService.GetCommitteeByIdAsync(nomination.CommitteeId);
             var registeredInterest = await _service.GetRegisteredInterestByIds(nomination.NomineeId, nomination.CommitteeId);
+            var statement = await _service.GetChairStatements(new ChairStatement { CommitteeId = nomination.CommitteeId, MemberId = nomination.NomineeId });
             nominationDetails.Add(new NominationViewModel
             {
                 Id = nomination.Id,
@@ -47,14 +68,16 @@ public class ChairNominationController : Controller
                 CommitteeId = nomination.CommitteeId,
                 CommitteeName = committee ?? "Unknown",
                 NominationDate = nomination.NominationDate,
-                Summary = nomination.NominationSummary,
+                Summary = statement?.ChairStatementText ??  "",
                 RegisteredInterest = registeredInterest?.RegisteredInterestText,
                 VoteRegisteredInterest = nomination.RegisteredInterest,// registeredInterest != null ? registeredInterest.RegisteredInterestText : "",
                 NominateeParty = (nominee.Value as MemberApi.Models.Member).LatestParty.Name ?? "Unknown"
             });
         }
-        return View(nominationDetails);
+        return nominationDetails;
     }
+
+
 
     public async Task<IActionResult> Create()
     {
@@ -62,7 +85,7 @@ public class ChairNominationController : Controller
         {
             Committees = new List<KeyValuePair<int, string>>()
         };
-        var committees = await _committeeService.GetAllCommitteesAsync();
+        var committees = await _committeeService.GetAllCommitteesAsync("ACTIVE");
 
         nomination.Committees.AddRange(
             committees.Select(c => new KeyValuePair<int, string>(c.Id, c.Name))
@@ -92,7 +115,8 @@ public class ChairNominationController : Controller
         }
 
         nomination.Committees = new List<KeyValuePair<int, string>>();
-        var committees = await _committeeService.GetAllCommitteesAsync();
+        var committees = await _committeeService.GetAllCommitteesAsync("ACTIVE");
+
         nomination.Committees.AddRange(
             committees.Select(c => new KeyValuePair<int, string>(c.Id, c.Name))
         );
@@ -126,23 +150,23 @@ public class ChairNominationController : Controller
         return RedirectToAction(nameof(Index));
     }
     
-        [HttpGet("registered-interest")]
-        public async Task<IActionResult> RegisterInterests(int MemberId, int CommitteeId)
-        {
-            var model = new RegisteredInterest();
+    [HttpGet("registered-interest")]
+    public async Task<IActionResult> RegisterInterests(int MemberId, int CommitteeId)
+    {
+        var model = new RegisteredInterest();
 
-            model.CommitteeId = CommitteeId;
-            model.MemberId = MemberId;
-            var checkModel = await _service.GetRegisteredInterest(model);
-            if (checkModel != null)
-            {
-                model = checkModel;
-            }
-            return View(model);
-        }
-        [HttpPost]
-        public async Task<IActionResult> AddRegisterInterest(RegisteredInterest model)
+        model.CommitteeId = CommitteeId;
+        model.MemberId = MemberId;
+        var checkModel = await _service.GetRegisteredInterest(model);
+        if (checkModel != null)
         {
+            model = checkModel;
+        }
+        return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AddRegisterInterest(RegisteredInterest model)
+    {
         if (ModelState.IsValid)
         {
             _service.SaveOrUpdateInterest(model);
@@ -152,7 +176,33 @@ public class ChairNominationController : Controller
             ModelState.AddModelError("RegisteredInterestText", "Error");
             RedirectToAction("RegisterInterests", model);
         }
-            return RedirectToAction("Index");//
+        return RedirectToAction("Index");//
+    }
+    [HttpGet("chair-statements")]
+    public async Task<IActionResult> ChairStatements(int MemberId, int CommitteeId)
+    {
+        var model = new ChairStatement();
+
+        model.CommitteeId = CommitteeId;
+        model.MemberId = MemberId;
+        var checkModel = await _service.GetChairStatements(model);
+        if (checkModel != null)
+        {
+            model = checkModel;
         }
+        return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AddChairStatement(ChairStatement model)
+    {
+        if (!ModelState.IsValid)
+        {
+            // Return the view with validation messages so the user can fix the input
+            return View("ChairStatements", model);
+        }
+
+        await _service.SaveOrUpdateChairStatement(model);
+        return RedirectToAction("Index");
+    }
 
 }

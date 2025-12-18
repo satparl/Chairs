@@ -14,12 +14,13 @@
         var nominatorNameTemp = ViewData["NominatedBy"] as MemberApi.Models.Member;
         nominatorName = nominatorNameTemp?.NameDisplayAs ?? "";
     }
+
     var committees = Model.Committees.Select(c => new SelectListItem
-{
-    Value = c.Key.ToString(),
-    Text = c.Value,
-    Selected = (c.Key == Model.CommitteeId)
-}).ToList();
+    {
+        Value = c.Key.ToString(),
+        Text = c.Value,
+        Selected = (c.Key == Model.CommitteeId)
+    }).ToList();
 
 }
 

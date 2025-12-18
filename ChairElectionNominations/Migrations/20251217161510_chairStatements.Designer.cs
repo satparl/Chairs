@@ -3,6 +3,7 @@ using System;
 using ChairElections.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChairElectionNominations.Migrations
 {
     [DbContext(typeof(CommitteeContext))]
-    partial class CommitteeContextModelSnapshot : ModelSnapshot
+    [Migration("20251217161510_chairStatements")]
+    partial class chairStatements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -44,27 +47,6 @@ namespace ChairElectionNominations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ChairNominations");
-                });
-
-            modelBuilder.Entity("ChairElections.Models.ChairStatement", b =>
-                {
-                    b.Property<int>("ChairStatementId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ChairStatementText")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CommitteeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MemberId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ChairStatementId");
-
-                    b.ToTable("ChairStatements");
                 });
 
             modelBuilder.Entity("ChairElections.Models.Committee", b =>

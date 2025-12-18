@@ -49,15 +49,27 @@
             <td> @nomOtherParty</td>
             <td>
                 <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
-                    Show Votes
+                    Show Nominations
                 </button>
 
 <a asp-controller="ChairNomination"
    asp-action="RegisterInterests"
    asp-route-MemberId="@nomineeInfo.NomineeId"
    asp-route-CommitteeId="@committee.CommitteeId"
+      asp-route-nomineeName="@nomineeInfo.NomineeName"
+   asp-route-committeeName="@committee.CommitteeName"
    class="btn btn-sm btn-outline-info">
    Add Interest
+</a>
+
+<a asp-controller="ChairNomination"
+   asp-action="ChairStatements"
+   asp-route-MemberId="@nomineeInfo.NomineeId"
+   asp-route-CommitteeId="@committee.CommitteeId"
+   asp-route-nomineeName="@nomineeInfo.NomineeName"
+   asp-route-committeeName="@committee.CommitteeName"
+   class="btn btn-sm btn-outline-info">
+   Add Statement
 </a>
 
             </td>

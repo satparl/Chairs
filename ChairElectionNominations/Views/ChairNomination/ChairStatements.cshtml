@@ -1,0 +1,82 @@
+@using ChairElections.Models
+@model ChairStatement 
+@{
+    ViewData["Title"] = "Add Chair Statements";
+    var summaryText = "Adding Chair Statements for Member {member} and committee {committee} " ;
+
+        // Prefer values from the query string, fall back to POSTed form values if present
+        var committeeNameQs = ViewContext.HttpContext.Request.Query["CommitteeName"].ToString();
+        var nomineeNameQs = ViewContext.HttpContext.Request.Query["NomineeName"].ToString();
+
+        var committeeName = !String.IsNullOrWhiteSpace(committeeNameQs) ? committeeNameQs : Model.CommitteeId.ToString();
+        var nomineeName = !String.IsNullOrWhiteSpace(nomineeNameQs) ? nomineeNameQs : Model.MemberId.ToString();
+
+
+        summaryText = $"Adding Chair Statements for <strong>{nomineeName}</strong> and committee <strong>{committeeName}</strong>";
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>@Html.Raw(summaryText)</p>
+<form asp-action="AddChairStatement" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <input asp-for="MemberId" type="hidden" name="MemberId" class="form-control" />
+    </div>
+    <div class="form-group">
+        <input asp-for="CommitteeId" type="hidden" name="CommitteeId" class="form-control" />
+            <!-- Persist the displayable names so they survive a POST/validation roundtrip -->
+            <input type="hidden" name="CommitteeName" value="@committeeName" />
+            <input type="hidden" name="NomineeName" value="@nomineeName" />
+    </div>
+
+    <div class="form-group">
+        <textarea asp-for="ChairStatementText" id="ChairStatementText" rows="5" placeholder="please enter chair statement here" class="form-control"></textarea>
+        <span asp-validation-for="ChairStatementText" class="text-danger"></span>
+        <small id="wordCount" class="form-text text-muted">500 words remaining</small>
+        <small id="wordWarning" class="form-text text-danger d-none">You have exceeded the 500 word limit.</small>
+    </div>
+
+    <button id="submitButton" type="submit" class="btn btn-primary">Submit Statement</button>
+    <a href="/ChairNomination" type="submit" class="btn btn-primary">Cancel</a>
+</form>
+
+<script>
+    // Live word count for the Chair Statement textarea with 500 word limit enforcement
+    (function () {
+        const MAX_WORDS = 500;
+        function countWords(text) {
+            if (!text) return 0;
+            // Split on any whitespace and filter out empty entries
+            return text.trim().split(/\s+/).filter(function (w) { return w.length > 0; }).length;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var textarea = document.getElementById('ChairStatementText');
+            var counter = document.getElementById('wordCount');
+            var warning = document.getElementById('wordWarning');
+            var submit = document.getElementById('submitButton');
+            if (!textarea || !counter) return;
+
+            function update() {
+                var words = countWords(textarea.value);
+                var remaining = MAX_WORDS - words;
+                if (remaining < 0) {
+                    counter.textContent = Math.abs(remaining) + (Math.abs(remaining) === 1 ? ' word over' : ' words over');
+                    counter.classList.add('text-danger');
+                    warning.classList.remove('d-none');
+                    if (submit) submit.disabled = true;
+                    textarea.classList.add('is-invalid');
+                } else {
+                    counter.textContent = remaining + (remaining === 1 ? ' word remaining' : ' words remaining');
+                    counter.classList.remove('text-danger');
+                    warning.classList.add('d-none');
+                    if (submit) submit.disabled = false;
+                    textarea.classList.remove('is-invalid');
+                }
+            }
+
+            textarea.addEventListener('input', update);
+            update(); // initialize
+        });
+    })();
+</script>

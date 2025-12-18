@@ -17,6 +17,8 @@ builder.Services.AddDbContext<CommitteeContext>();
 builder.Services.AddScoped<ChairNominationService>();
 builder.Services.AddScoped<CommitteeService>();
 
+builder.Services.AddControllers().AddXmlSerializerFormatters();
+
 builder.Services.AddHttpClient();
 
 //builder.Services.AddScoped<MembersApiService>();

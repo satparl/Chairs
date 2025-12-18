@@ -21,6 +21,9 @@ public class CommitteeContext : DbContext
     public DbSet<RegisteredInterest> RegisteredInterests { get; set; }
 
 
+    public DbSet<ChairStatement> ChairStatements { get; set; }
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         // Read values from appsettings.json

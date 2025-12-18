@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ChairElections.Models;
+using Microsoft.VisualBasic;
 
 namespace ChairElections.Services;
 
@@ -12,8 +13,12 @@ public class CommitteeService
         _context = context;
     }
 
-    public async Task<List<Committee>> GetAllCommitteesAsync()
+    public async Task<List<Committee>> GetAllCommitteesAsync(string Status = "")
     {
+        if (!string.IsNullOrEmpty(Status))
+        {
+            return await _context.Committees.Where(c => c.Status.Trim() == Status.Trim()).ToListAsync();
+        }
         return await _context.Committees.ToListAsync();
     }
 
